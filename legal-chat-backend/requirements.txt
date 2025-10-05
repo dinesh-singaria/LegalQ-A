@@ -1,0 +1,14 @@
+# Web framework
+fastapi==0.115.2
+uvicorn[standard]==0.32.0
+
+# NLP / ML
+transformers==4.44.2
+torch==2.4.1
+
+# Document parsing
+pymupdf==1.24.9        # for PDF text extraction
+python-docx==1.1.2     # for DOCX parsing
+
+# Optional (for env handling / debugging)
+python-multipart==0.0.9
