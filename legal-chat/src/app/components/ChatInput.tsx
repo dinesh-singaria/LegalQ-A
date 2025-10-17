@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useState, FormEvent, useRef } from "react";
 
 type Mode = "ask" | "summarize";

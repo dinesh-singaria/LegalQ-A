@@ -3,6 +3,8 @@
 import { useRef, useState, useEffect } from "react";
 import ChatMessage from "./components/ChatMessage";
 import ChatInput from "./components/ChatInput";
+import { chatJson } from "@/lib/api"; // ✅ add
+import { chatFile } from "@/lib/upload"; // ✅ add
 
 type Message = { text: string; type: "user" | "bot" | "error" | "system" };
 
@@ -28,44 +30,42 @@ export default function Home() {
     file?: File,
     mode?: "ask" | "summarize"
   ) => {
-    setMessages((m) => [
-      ...m,
-      { type: "user", text: mode === "ask" ? question : "📄 Summarize file" },
-    ]);
+    const userText = file
+      ? `${mode === "summarize" ? "📄 Summarize" : "📄 Ask about"}: ${
+          file.name
+        }${question?.trim() ? ` — “${question.trim()}”` : ""}`
+      : question?.trim() || "(no question)";
+
+    setMessages((m) => [...m, { type: "user", text: userText }]);
     setLoading(true);
 
     try {
-      let res: Response;
+      let answerText = "";
+
       if (file) {
-        const form = new FormData();
-        form.append("question", question);
-        form.append("file", file);
-        form.append("mode", mode || "ask");
-        res = await fetch("/api/chat", { method: "POST", body: form });
-      } else {
-        res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question, context: "", mode }),
-        });
-      }
-
-      const data = await res.json();
-
-      if (data.error) {
-        setMessages((m) => [...m, { type: "error", text: `⚠️ ${data.error}` }]);
-      } else {
-        // ✅ Ensure text is a string (avoid rendering objects)
-        const answerText =
+        const data = await chatFile(file, question, mode ?? "ask");
+        if (data.error) throw new Error(data.error);
+        answerText =
           typeof data.answer === "object"
             ? JSON.stringify(data.answer, null, 2)
-            : data.answer;
-
-        setMessages((m) => [
-          ...m,
-          { type: "bot", text: answerText || "No response." },
-        ]);
+            : data.answer || "";
+      } else {
+        const data = await chatJson({
+          question,
+          context: question || " ",
+          mode: mode ?? "ask",
+        });
+        if (data.error) throw new Error(data.error);
+        answerText =
+          typeof data.answer === "object"
+            ? JSON.stringify(data.answer, null, 2)
+            : data.answer || "";
       }
+
+      setMessages((m) => [
+        ...m,
+        { type: "bot", text: answerText || "No response." },
+      ]);
     } catch (err: any) {
       setMessages((m) => [
         ...m,
@@ -78,7 +78,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-100 flex flex-col items-center">
-      {/* Header */}
       <header className="w-full max-w-3xl py-6 px-4">
         <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
           ⚖️ Legal Q&A Assistant
@@ -88,10 +87,9 @@ export default function Home() {
         </p>
       </header>
 
-      {/* Chat window */}
       <div
         ref={listRef}
-        className="flex-1 w-full max-w-3xl overflow-y-auto bg-white rounded-2xl shadow p-4 border"
+        className="flex-1 w-full max-w-3xl overflow-y-auto bg-white rounded-2xl shadow p-4 border flex flex-col gap-2"
       >
         {messages.map((msg, i) => (
           <ChatMessage key={i} type={msg.type} text={msg.text} />
@@ -101,7 +99,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* Input bar */}
       <div className="w-full max-w-3xl p-4">
         <ChatInput onSubmit={askBackend} disabled={loading} />
       </div>
