@@ -4,8 +4,20 @@ from agents.ask_agent import run_ask_agent
 from agents.summarize_agent import run_summarize_agent
 from utils.file_reader import extract_text_from_file
 from io import BytesIO
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://legalassistant-alpha.vercel.app",
+        "http://localhost:3000",
+    ],
+    allow_credentials=False,   # set True only if you use cookies
+    allow_methods=["POST", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 class ChatRequest(BaseModel):
     question: str
