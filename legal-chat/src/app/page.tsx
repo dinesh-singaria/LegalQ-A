@@ -41,7 +41,6 @@ export default function Home() {
         form.append("question", question);
         form.append("file", file);
         form.append("mode", mode || "ask");
-
         res = await fetch("/api/chat", { method: "POST", body: form });
       } else {
         res = await fetch("/api/chat", {
@@ -56,7 +55,16 @@ export default function Home() {
       if (data.error) {
         setMessages((m) => [...m, { type: "error", text: `⚠️ ${data.error}` }]);
       } else {
-        setMessages((m) => [...m, { type: "bot", text: data.answer }]);
+        // ✅ Ensure text is a string (avoid rendering objects)
+        const answerText =
+          typeof data.answer === "object"
+            ? JSON.stringify(data.answer, null, 2)
+            : data.answer;
+
+        setMessages((m) => [
+          ...m,
+          { type: "bot", text: answerText || "No response." },
+        ]);
       }
     } catch (err: any) {
       setMessages((m) => [

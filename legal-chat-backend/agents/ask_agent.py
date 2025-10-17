@@ -11,4 +11,13 @@ Question:
 
 Answer:"""
 
-    return legal_agent.chat(prompt)
+    # Get the raw response object
+    response = legal_agent.run(prompt)
+
+    # Extract just the text content
+    if isinstance(response, dict) and "content" in response:
+        return response["content"].strip()
+    elif hasattr(response, "content"):   # if it's an object with a .content attribute
+        return response.content.strip()
+    else:
+        return str(response)

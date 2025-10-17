@@ -10,4 +10,14 @@ Context:
 
 Summary:"""
 
-    return legal_agent.chat(final_prompt)
+    result = legal_agent.run(final_prompt)
+
+    # ✅ Safely extract text
+    if hasattr(result, "content"):
+        return result.content
+    elif hasattr(result, "output"):
+        return result.output
+    elif isinstance(result, dict) and "content" in result:
+        return result["content"]
+    else:
+        return str(result)

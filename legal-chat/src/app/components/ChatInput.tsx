@@ -59,7 +59,7 @@ export default function ChatInput({ onSubmit, disabled }: ChatInputProps) {
         className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center"
       >
         <input
-          className="flex-1 rounded-xl border px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          className="flex-1 rounded-xl border px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-800"
           placeholder={
             mode === "ask"
               ? "Ask your legal question…"

@@ -1,14 +1,21 @@
-# Web framework
+# --- Web Framework ---
 fastapi==0.115.2
 uvicorn[standard]==0.32.0
 
-# NLP / ML
+# --- NLP / ML ---
 transformers==4.44.2
-torch==2.4.1
+torch==2.6.0
 
-# Document parsing
-pymupdf==1.24.9        # for PDF text extraction
-python-docx==1.1.2     # for DOCX parsing
+# --- Document Parsing ---
+pymupdf==1.24.9        # PDF text extraction
+python-docx==1.1.2     # DOCX parsing
 
-# Optional (for env handling / debugging)
+# --- Phidata Agents ---
+phidata>=2.0.0          # Core agentic framework
+google-generativeai>=0.5.2  # Gemini integration
+
+# --- FastAPI File Uploads ---
 python-multipart==0.0.9
+
+# --- Optional ---
+python-dotenv==1.0.1    # Environment variables
